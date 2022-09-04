@@ -1,0 +1,197 @@
+﻿<! DOCTYPE html>
+<html><head><meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+	<title> Multiplicaciones elementales: 1 </title>
+	</head><body>
+	<center>
+		<h1 style="font-size:240%;color:teal;font-family:cursive"><b>Módulo 1: multiplicación básica de números</b></h1>
+		<img src="images/producto.png" height="100"><h1 style="color:magenta;font-family:courier;font-style:italic"></h1>
+		<h1 style="font-size:210%;color:blue;font-family:cursive"><b>Diseñado por: Camilo Cubides</b></h1>
+		<h2 style="font-size:180%;color:DodgerBlue;font-family:cursive;background-color:LightGray;">Aplicación que permite practicar matemáticas básicas para niños</h2>
+	</center>
+		
+	<script>
+			// Aquí van las funciones que son programadas por el usuario
+		var numberOk = 16
+		var numberWrong = 22
+		var numberThinking = 8
+		var numberTrophy = 21
+		var numberElementA = 11
+		var numberElementB = 11
+		var operando0
+		var operando1
+		var lastOperando0 = -1
+		var lastOperando1 = -1
+		var prod
+		var randomNumber
+		var coinsWon = 0
+		var maxInitialOperatorNumber = 2
+		var maxNumberTrophies = 10
+		var trophy = 0
+		var level = 0
+		
+		//Calcula un número aleatorio entre min y max, que incluye min, pero no max
+		function getRandomInt(min, max) {
+			return Math.floor(Math.random() * (max - min)) + min;
+		}
+		
+		function trim(str){
+			if(str.length > 0){
+				while(str.charAt(str.length - 1) == '\n' || str.charAt(str.length - 1) == ' '){
+					str = str.substring(0,str.length - 1)
+				}
+			}
+			return str
+		}
+		
+		//Delete a table 'id'
+	    function cleanMatrixTbl(id){
+			var tbl = document.getElementById(id)
+			var child = tbl.childNodes
+			for(var i = child.length - 1; i >= 0; i--){
+				tbl.removeChild(child[i])
+			}
+	    }
+		
+		//Fill a table 'id' of 'm' rows and 'n' columns
+		function fillArrayCoins(n,idTrophies,idMedals,increment){
+			cleanMatrixTbl(idTrophies)
+			cleanMatrixTbl(idMedals)
+			var arrayTrophies = document.getElementById(idTrophies)
+			var arrayMedals, row, cell, elem
+			row = document.createElement("tr")
+			trophy = Math.floor(n / maxNumberTrophies)
+			if(trophy > numberTrophy){
+				trophy = numberTrophy
+			}
+			for(var i = 0; i < n % maxNumberTrophies; i++){
+				cell = document.createElement("td")
+				elem = document.createElement("txt")
+				elem.innerHTML = "<img src='images/trophy-" + trophy + ".png' height='" + (30+3*i) + "'>"
+				cell.appendChild(elem)
+				row.appendChild(cell)
+			}
+			if(increment >0 && n > 0 && (n % maxNumberTrophies == 0)){
+				cell = document.createElement("td")
+				elem = document.createElement("txt");
+				elem.innerHTML = "<img src='images/Ralph.png' height='" + (80+10*trophy)  + "'>"
+				cell.appendChild(elem)
+				row.appendChild(cell)
+			}
+			arrayTrophies.appendChild(row)
+			
+			if(n >= maxNumberTrophies){
+				arrayMedals = document.getElementById(idMedals)
+				row = document.createElement("tr")
+				for(var i = 0; i < Math.floor(n / maxNumberTrophies); i++){
+					cell = document.createElement("td")
+					elem = document.createElement("txt");
+					elem.innerHTML = "<img src='images/medal.png' height='" + (40+3*i)  + "'>"
+					cell.appendChild(elem)
+					row.appendChild(cell)
+				}
+				arrayMedals.appendChild(row)
+			}
+		}
+		
+		function getImageNumber(digit){
+			return "images/Numero-" + digit + ".png"
+		}
+		
+		function modifyArrayCoins(tableTrophies,tableMedals,increment){
+			coinsWon += increment
+			if(coinsWon <= 0){
+				cleanMatrixTbl(tableTrophies)
+				cleanMatrixTbl(tableMedals)
+				coinsWon = 0
+			}else{ 
+				fillArrayCoins(coinsWon,tableTrophies,tableMedals,increment)			
+			}
+		}
+		
+		function checkResultProductFieldText(degree,button,tableTrophies,tableMedals,value){
+			if(prod == value){
+				document.getElementById(degree).src = "images/ok-" + getRandomInt(0,numberOk) + ".png"
+				modifyArrayCoins(tableTrophies,tableMedals,1)
+				document.getElementById('buttonRandom').style.display = 'none';
+				alert("El resultado es correcto  \\(^‿^)/   \\(●‿●)/   \\(◉‿◉)/")
+				generateNewNumbers3('numTbl0','numTbl1','degree')
+			}else{
+				document.getElementById(degree).src = "images/wrong-" + getRandomInt(0,numberWrong) + ".png"
+				modifyArrayCoins(tableTrophies,tableMedals,-1)
+				alert("El resultado es incorrecto   ¯\\_(︶︹︺)_/¯    ¯\\_(⋋▂⋌)_/¯    ¯\\_(Ò_Ó)_/¯")
+				document.getElementById('buttonRandom').style.display = 'inline';
+			}				
+		}
+		
+		function fillImageWithNumber(listDigits,number){
+			cleanMatrixTbl(listDigits)
+			var array = document.getElementById(listDigits)
+			var row, cell, elem, lastCell = null
+			row = document.createElement("tr")
+			var digit		
+			do{
+				digit = Math.floor(number % 10)
+				cell = document.createElement("td")
+				elem = document.createElement("txt");
+				elem.innerHTML = "<img src='" + getImageNumber(digit) + "' height='110' alt=" + digit + ">" 
+				cell.appendChild(elem)
+				row.insertBefore(cell,lastCell)
+				lastCell = cell
+				number = Math.floor((number - digit) / 10)
+			}while(number > 0);
+			array.appendChild(row)
+		}
+		
+		function generateNewNumbers3(numTbl0,numTbl1,degree){
+			randomNumber = Math.min(Math.floor(coinsWon / 10) + maxInitialOperatorNumber,10)
+			do{
+				operando0 = getRandomInt(1,randomNumber+getRandomInt(0,2))
+				//operando1 = getRandomInt(1,randomNumber+getRandomInt(0,2))
+				operando1 = getRandomInt(1,10)
+			}while(operando0 == lastOperando0 && operando1 == lastOperando1)
+			lastOperando0 = operando0
+			lastOperando1 = operando1
+			fillImageWithNumber(numTbl0,operando0)
+			fillImageWithNumber(numTbl1,operando1)
+			document.getElementById(degree).src = "images/pensando-" + getRandomInt(0,numberThinking) + ".png"
+			prod  = operando0 * operando1	
+		}
+		
+		document.addEventListener("keyup", function(event) {
+			if (event.key === 'Enter' && document.getElementById('text1').value != '') {
+				checkResultProductFieldText('degree',0,'tableTrophies','tableMedals',parseInt(document.getElementById('text1').value));
+				document.getElementById('text1').value = ''
+			}
+		});
+	</script>
+	<hr><hr>
+	<center>
+		<h2 style="color:purple;font-family:'Courier New'">¿El resultado de multiplicar los siguientes dígitos es?</br>Escriba el número</h2>
+		<table style ="border-spacing:5px;">	
+			<tr>
+				<td><table id="numTbl0"><tr><td></td></tr></table></td>
+				<td><img src="images/producto.png" height="70"></td>
+				<td><table id="numTbl1"><tr><td></td></tr></table></td>
+				<td><img src="images/equals.png" height="50"></td>
+				<td><input type="text" id="text1" style="font-size:350%;color:magenta;font-family:cursive" size="1" maxlength="2"></td>
+				<td><button id="buttonCheck" onclick="checkResultProductFieldText('degree',0,'tableTrophies','tableMedals',parseInt(text1.value));text1.value=''"><img src="images/Magnifying.png" height="80" alt="Nuevo problema"></button></td>
+			</tr>				
+		</table>
+	</center>
+	<br>
+	<center>
+	<img id="degree" src="images/pensando-1.png" height="90"> &nbsp;&nbsp;&nbsp;&nbsp;
+	<button id="buttonRandom" name='buttonGenerate' onclick="generateNewNumbers3('numTbl0','numTbl1','degree')" style="display:none"><img src='images/dices.png' height='90' alt='Nuevo problema'></button>
+	<table id="tableMedals"><tr><td></td></tr></table>
+	</center>
+	<center><table id="tableTrophies"><tr><td></td></tr></table></center>
+	<script>generateNewNumbers3('numTbl0','numTbl1','degree')</script>
+	<hr><hr>
+	<center>
+	<button style="font-size:200%;font-family:cursive;background-color:cyan"><a href="index.html"><b> Regresar </b></a></button>
+	</center>
+</body></html>
+
+
+<!--;text1.disabled=true;text1.disabled=false-->
